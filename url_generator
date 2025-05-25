@@ -1,12 +1,12 @@
 import requests
 response = requests.get('https://www.flipkart.com/search?q=puma+running+shoes+under+3000')
 html = response.text  # for the HTML content
-input = (p,s, 'url')
-p= "3000"
-s='9'
-	def generate_adidas_url(input):
-		prompt = "you are a url generator agent your work is to generate actual url for addidas shoes you can follow this url as an example https://www.flipkart.com/search?q=puma+running+shoes+under+3000"
-		result = llm.invoke(prompt, tools=["generate_flipkart_url"], input=input)
-		return list(result)
+input = {"size": "9","price": "3000","brand": "adidas"}
+def generate_adidas_url(input):
+	prompt = "you are a url generator agent your work is to generate actual url for addidas shoes you can follow this url as an example https://www.flipkart.com/search?q=puma+running+shoes+under+3000"
+	result = llm.invoke(prompt, tools=["generate_flipkart_url"], input=input)
+	return list(result)
+generated_url = generate_adidas_url(input)
+print("Generated URL:", generated_url)
 
 
