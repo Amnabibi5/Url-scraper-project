@@ -1,0 +1,62 @@
+import openai
+
+# Set your OpenAI API key
+openai.api_key = ""  # Replace with your actual API key
+
+# Define the function schema for the LLM to call
+functions = [
+    {
+        "name": "get_women_shoe_links",
+        "description": "Generate real URLs for websites selling women's shoes",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "style": {
+                    "type": "string",
+                    "description": "Type of women's shoes (e.g., heels, sneakers, boots, sandals)"
+                },
+                "country": {
+                    "type": "string",
+                    "description": "Target country or region (e.g., USA, UK, India)"
+                }
+            },
+            "required": ["style", "country"]
+        }
+    }
+]
+
+# Send prompt to the model
+response = openai.chat.completions.create(
+                                        
+    model="gpt-3.5-turbo", 
+    messages=[
+        {"role": "user", "content": "Get top online stores for women's sneakers in USA."}
+    ],
+    functions=functions,
+    function_call={"name": "get_women_shoe_links"})
+
+# Extract function arguments from the model
+args = response["choices"][0]["message"]["function_call"]["arguments"]
+import json
+args = json.loads(args)
+
+# Example function to simulate the result
+def get_women_shoe_links(style, country):
+    # In real-world use, this could trigger a scraper or database query
+    return {
+        "style": style,
+        "country": country,
+        "links": [
+            "https://www.nike.com/w/womens-sneakers-5e1x6z5e1x6",
+            "https://www.adidas.com/us/women-shoes",
+            "https://www.zappos.com/women-shoes",
+            "https://www.dsw.com/en/us/category/womens-sneakers/N-1z141dj",
+            "https://www.nordstrom.com/browse/women/shoes"
+        ]
+    }
+
+# Get and print the final links
+results = get_women_shoe_links(args["style"], args["country"])
+print("✅ Authentic Links for Women's Shoes:")
+for link in results["links"]:
+    print(link)
