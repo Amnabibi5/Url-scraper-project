@@ -1,12 +1,18 @@
 import requests
-response = requests.get('https://www.flipkart.com/search?q=puma+running+shoes+under+3000')
-html = response.text  # for the HTML content
-input = {"size": "9","price": "3000","brand": "adidas"}
-def generate_adidas_url(input):
-	prompt = "you are a url generator agent your work is to generate actual url for addidas shoes you can follow this url as an example https://www.flipkart.com/search?q=puma+running+shoes+under+3000"
-	result = llm.invoke(prompt, tools=["generate_flipkart_url"], input=input)
-	return list(result)
-generated_url = generate_adidas_url(input)
+from bs4 import BeautifulSoup
+
+def generate_flipkart_url(womenshoes, size, price):
+    query = f"{womenshoes}+running+shoes+under+{price}+size+{size}"
+    return f"https://www.flipkart.com/search?q={query}"
+
+generated_url = generate_flipkart_url("womenshoes", "7", "3000")
 print("Generated URL:", generated_url)
+
+response = requests.get(generated_url)
+if response.status_code == 200:
+    soup = BeautifulSoup(response.text, 'html.parser')
+    print("Page Title:", soup.title.string)
+else:
+    print(f"Error: {response.status_code}")
 
 
