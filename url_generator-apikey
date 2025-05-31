@@ -1,0 +1,55 @@
+import requests
+import os
+
+# === 1. API KEY SETUP ===
+API_KEY = os.getenv("OPENAI_API_KEY")
+if not API_KEY:
+    API_KEY = ""  # 🔐 Replace this with your real key
+
+# === 2. OpenAI API Endpoint and Headers ===
+API_URL = "https://api.openai.com/v1/chat/completions"
+headers = {
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json"
+}
+
+# === 3. Get user input ===
+product_name = input("Enter a product name (e.g., 'nike shoes'): ")
+
+# === 4. Prompt to generate real-looking URLs ===
+prompt = (
+    f"Generate 10 realistic full URLs for the product '{product_name}'.\n"
+    "Use real and popular e-commerce sites like Amazon, eBay, Walmart, etc.\n"
+    "Return only a plain list of URLs, no descriptions, no bullet points, just numbered URLs."
+)
+
+# === 5. Prepare the data payload ===
+data = {
+    "model": "gpt-3.5-turbo",
+    "messages": [
+        {"role": "system", "content": "You are a helpful assistant that returns real shopping URLs."},
+        {"role": "user", "content": prompt}
+    ],
+    "max_tokens": 700,
+    "temperature": 0.3
+}
+
+# === 6. Make the request ===
+try:
+    response = requests.post(API_URL, headers=headers, json=data)
+    response.raise_for_status()  # Raise error for bad status
+
+    # === 7. Parse and print the output ===
+    result = response.json()
+    message = result["choices"][0]["message"]["content"]
+
+    print("\n✅ Realistic Product URLs:\n")
+    print(message.strip())
+
+except requests.exceptions.RequestException as e:
+    print("❌ Request failed:", e)
+    print("Response content:", response.text if 'response' in locals() else "No response")
+
+except KeyError:
+    print("❌ Unexpected response format:")
+    print(response.json())
